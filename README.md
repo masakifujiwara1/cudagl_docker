@@ -1,4 +1,4 @@
-# ros2_docker
+# cudagl_docker
 「Ubuntu + ROS2 」を含むDocker環境を提供します.  
 Provides a Docker environment including "Ubuntu + ROS2".
 
@@ -80,4 +80,3 @@ BSD
 
 ## Tested on ...
 - ubuntu 20.04 LTS
-# cudagl_docker
