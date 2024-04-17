@@ -91,6 +91,9 @@ RUN pip3 install xacro
 # install pytorch
 RUN pip3 install torch torchvision
 
+WORKDIR /home
+ENV HOME /home
+
 # config setting
 COPY config/.bashrc /home/.bashrc
 COPY config/.vimrc /home/.vimrc
