@@ -3,7 +3,7 @@ FROM nvidia/cudagl:11.3.0-devel-ubuntu20.04
 
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND noninteractive
-ARG ROS_DISTRO=foxy
+ARG ROS_DISTRO=humble
 ARG ROS_PKG=desktop
 ENV ROS_ROOT=/opt/ros/${ROS_DISTRO}
 ENV ROS_PYTHON_VERSION=3
