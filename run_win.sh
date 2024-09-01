@@ -3,7 +3,7 @@
 eval "docker container run \
 --network host \
 -it \
---name my-cudagl \
+--name my-cudagl-torcs \
 -e DISPLAY=$DISPLAY \
 -e PULSE_SERVER=$PULSE_SERVER \
 -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
@@ -12,9 +12,10 @@ eval "docker container run \
 -v $PWD/docker_share:/home/host_files \
 --privileged \
 -v /dev:/dev \
+-v $PWD/gym_torcs/reward.py:$PWD/gym_torcs/reward.py \
 -v /mnt/wslg:/mnt/wslg \
 --env="XAUTHORITY=$XAUTH" \
 -v "$XAUTH:$XAUTH" \
 --env="QT_X11_NO_MITSHM=1" \
 --ipc=host \
-masakifujiwara1/cudagl:11.3.0-devel-ubuntu20.04-torch"
+masakifujiwara1/cudagl:11.3.0-devel-ubuntu20.04-torch-torcs"
