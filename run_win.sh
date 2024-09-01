@@ -9,10 +9,10 @@ eval "docker container run \
 -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
 -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
--v $PWD/docker_share:/home/host_files \
+-v $PWD/docker_share:/home/ubuntu/host_files \
 --privileged \
 -v /dev:/dev \
--v $PWD/gym_torcs/reward.py:$PWD/gym_torcs/reward.py \
+-v $PWD/scripts/reward.py:/home/ubuntu/gym_torcs/reward.py \
 -v /mnt/wslg:/mnt/wslg \
 --env="XAUTHORITY=$XAUTH" \
 -v "$XAUTH:$XAUTH" \
