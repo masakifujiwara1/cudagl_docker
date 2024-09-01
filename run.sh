@@ -10,6 +10,7 @@ eval "docker container run \
 --privileged \
 -v /dev:/dev \
 -v $PWD/scripts/reward.py:/home/ubuntu/gym_torcs/reward.py \
+-v /run/user/1000/:/run/user/1000/ \
 --env="XAUTHORITY=$XAUTH" \
 -v "$XAUTH:$XAUTH" \
 --env="QT_X11_NO_MITSHM=1" \
