@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # install pytorch
-RUN pip3 install torch torchvision
+RUN pip3 install torch==1.12.1 torchvision==0.13.1
 
 # ENV setting
 ARG USER_NAME=ubuntu
