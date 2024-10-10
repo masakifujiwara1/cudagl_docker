@@ -72,13 +72,6 @@ WORKDIR /home/$USER_NAME
 # ENV HOME /home/$USER_NAME
 ENV TERM=xterm-256color
 
-# # set NVIDIA Container Toolkit
-# RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
-#         nvidia-container-toolkit \
-#         && \
-#     sudo apt-get clean && \
-#     sudo rm -rf /var/lib/apt/lists/*
-
 # install pytorch
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 
@@ -100,16 +93,11 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/*
 
-# initialize rosdep
-RUN sudo rosdep init && \
-    rosdep update
-
 # install ros2 packages
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
-        gazebo11 \
+        gazebo \
         ros-${ROS_DISTRO}-gazebo-ros-pkgs \
         ros-${ROS_DISTRO}-joint-state-publisher* \
-        python3-colcon-common-extensions \
         python3-colcon-mixin \
         python3-rosdep \
         python3-vcstool && \
@@ -124,9 +112,14 @@ RUN pip3 install xacro
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash && mkdir -p ros2_ws/src && cd ~/ros2_ws && colcon build --symlink-install
 
 # check OpenGL
-RUN apt-get update && apt-get install -y \
-    libglvnd0 libgl1 libglx0 libegl1 libxext6 libx11-6 && \
-    rm -rf /var/lib/apt/lists/*
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+        libglvnd0 \
+        libgl1 \
+        libglx0 \
+        libegl1 \
+        libxext6 \
+        libx11-6 && \
+    sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,graphics
