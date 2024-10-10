@@ -100,7 +100,7 @@ fi
 #    . /etc/bash_completion
 #fi
 
-source /opt/ros/foxy/setup.bash
+source /opt/ros/humble/setup.bash
 source ~/ros2_ws/install/setup.bash
 
 export ROS_WORKSPACE=${HOME}/ros2_ws
