@@ -14,4 +14,4 @@ eval "docker container run \
 -v "$XAUTH:$XAUTH" \
 --env="QT_X11_NO_MITSHM=1" \
 --ipc=host \
-masakifujiwara1/cudagl:11.3.0-devel-ubuntu20.04-torch"
+masakifujiwara1/cudagl:11.7.1-cudnn8-devel-ubuntu22.04-torch-humble"
