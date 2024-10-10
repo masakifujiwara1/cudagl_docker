@@ -6,7 +6,7 @@ eval "docker container run \
 --name my-cudagl \
 -e DISPLAY=$DISPLAY \
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
--v $PWD/docker_share:/home/host_files \
+-v $PWD/docker_share:/home/ubuntu/host_files \
 --privileged \
 -v /dev:/dev \
 --env="XAUTHORITY=$XAUTH" \
