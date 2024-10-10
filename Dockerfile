@@ -129,4 +129,6 @@ COPY config/.bashrc /home/$USER_NAME/.bashrc
 COPY config/.vimrc /home/$USER_NAME/.vimrc
 COPY config/.tmux.conf /home/$USER_NAME/.tmux.conf
 
+RUN sudo chown -R $USER_NAME:$PASSWORD .bashrc
+
 CMD ["bash"]
