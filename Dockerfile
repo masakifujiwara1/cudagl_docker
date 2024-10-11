@@ -98,6 +98,7 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
         gazebo \
         ros-${ROS_DISTRO}-gazebo-ros-pkgs \
         ros-${ROS_DISTRO}-joint-state-publisher* \
+        ros-${ROS_DISTRO}-image-transport* \
         python3-colcon-mixin \
         python3-rosdep \
         python3-vcstool && \
