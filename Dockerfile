@@ -24,7 +24,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive && \
     apt-get install -q -y --no-install-recommends \
         locales && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-RUN locale-gen=en_US.UTF-8
+RUN locale-gen en_US.UTF-8
 
 # install basic packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -91,7 +91,8 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     ros-noetic-map-server* \
     ros-noetic-dwa* \
     ros-noetic-gazebo-ros-pkgs \
-    python3-vcstool && \
+    python3-vcstool \
+    python3-wstool &&\
     sudo rosdep init && \
     rosdep update && \
     sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
