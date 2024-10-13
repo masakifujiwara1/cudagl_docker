@@ -1,8 +1,7 @@
-
 FROM nvidia/cudagl:11.3.0-devel-ubuntu20.04
 
 SHELL ["/bin/bash", "-c"]
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 ARG ROS_DISTRO=noetic
 ARG ROS_PKG=desktop
 ENV ROS_ROOT=/opt/ros/${ROS_DISTRO}
@@ -17,15 +16,15 @@ RUN echo 'Asia/Tokyo' > /etc/timezone && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # setup environment
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 # locale
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive && \
     apt-get install -q -y --no-install-recommends \
         locales && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-RUN locale-gen en_US.UTF-8
+RUN locale-gen=en_US.UTF-8
 
 # install basic packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -49,13 +48,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/*
 
+# ENV setting
+ARG USER_NAME=ubuntu
+ARG GROUP_NAME=ubuntu
+ARG UID=1000
+ARG GID=1000
+ARG PASSWORD=ubuntu
+RUN groupadd -g $GID $GROUP_NAME && \
+    useradd -m -s /bin/bash -u $UID -g $GID -G sudo $USER_NAME && \
+    echo $USER_NAME:$PASSWORD | chpasswd && \
+    echo "$USER_NAME   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+USER $USER_NAME
+WORKDIR /home/$USER_NAME
+# ENV HOME /home/$USER_NAME
+ENV TERM=xterm-256color
+
 # install pytorch
 RUN pip3 install torch torchvision
 
 # install ROS Noetic
-RUN sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' && \
-    sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 && \
-    sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+RUN sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros1.list > /dev/null
+
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     ros-noetic-desktop-full \
     && \
     sudo apt-get clean && \
@@ -69,17 +84,15 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/*
 
-# initialize rosdep
-RUN sudo rosdep init && \
-    rosdep update
-
 # install ros packages
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     ros-noetic-joint-state-publisher* \
     gazebo11 \
+    ros-noetic-map-server* \
+    ros-noetic-dwa* \
     ros-noetic-gazebo-ros-pkgs \
-    ros-noetic-can-msgs \
     python3-vcstool && \
+    sudo rosdep init && \
     rosdep update && \
     sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 
@@ -89,12 +102,30 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     && \
     sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home
-ENV HOME /home
+# set catkin workspace
+RUN source /opt/ros/noetic/setup.bash && mkdir -p catkin_ws/src && cd ~/catkin_ws && catkin build 
+
+# orne-box install
+RUN sudo apt-get update &&\
+    cd ~/catkin_ws/src &&\
+    git clone -b TC_2024_EX https://github.com/masakifujiwara1/orne-box &&\
+    wstool init &&\
+    wstool merge orne-box/orne_box_pkgs.install &&\
+    wstool up &&\
+    rosdep update &&\
+    rosdep install --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y &&\
+    cd ~/catkin_ws &&\
+    catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release &&\
+    source /opt/ros/noetic/setup.bash &&\
+    source ~/catkin_ws/devel/setup.bash &&\
+    sudo apt-get clean && \
+    sudo rm -rf /var/lib/apt/lists/*
 
 # config setting
-COPY config/.bashrc /home/.bashrc
-COPY config/.vimrc /home/.vimrc
-COPY config/.tmux.conf /home/.tmux.conf
+COPY config/.bashrc /home/$USER_NAME/.bashrc
+COPY config/.vimrc /home/$USER_NAME/.vimrc
+COPY config/.tmux.conf /home/$USER_NAME/.tmux.conf
+
+RUN sudo chown -R $USER_NAME:$PASSWORD .bashrc
 
 CMD ["bash"]
