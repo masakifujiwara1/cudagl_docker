@@ -1,8 +1,8 @@
-FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu20.04
 
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
-ARG ROS_DISTRO=humble
+ARG ROS_DISTRO=noetic
 ARG ROS_PKG=desktop
 ENV ROS_ROOT=/opt/ros/${ROS_DISTRO}
 ENV ROS_PYTHON_VERSION=3
@@ -42,20 +42,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         wget \
         gnupg \
         build-essential \
-        cmake \
-        gnupg2 \
         python3-dev \
         python3-pip \
-        software-properties-common \
-        libglvnd-dev \
-        libxext6 \
-        libx11-dev \
-        libxmu-dev \
-        libxi-dev \
-        libgl1-mesa-dev \
         && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    sudo apt-get clean && \
+    sudo rm -rf /var/lib/apt/lists/*
 
 # ENV setting
 ARG USER_NAME=ubuntu
@@ -73,57 +64,63 @@ WORKDIR /home/$USER_NAME
 ENV TERM=xterm-256color
 
 # install pytorch
-RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+# RUN pip3 install torch torchvision
 
-# install ROS2 Humble
+# install ROS Noetic
 RUN sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros1.list > /dev/null
+
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
-        ros-${ROS_DISTRO}-desktop \
-        && \
+    ros-noetic-desktop-full \
+    && \
     sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/*
 
-# install colcon and rosdep
+# install catkin and rosdep
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
-        python3-colcon-common-extensions \
-        python3-rosdep \
-        python3-argcomplete \
-        && \
+    python3-catkin-tools \
+    python3-rosdep \
+    && \
     sudo apt-get clean && \
     sudo rm -rf /var/lib/apt/lists/*
 
-# install ros2 packages
+# install ros packages
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
-        gazebo \
-        ros-${ROS_DISTRO}-gazebo-ros-pkgs \
-        ros-${ROS_DISTRO}-joint-state-publisher* \
-        ros-${ROS_DISTRO}-image-transport* \
-        python3-colcon-mixin \
-        python3-rosdep \
-        python3-vcstool && \
+    ros-noetic-joint-state-publisher* \
+    gazebo11 \
+    ros-noetic-map-server* \
+    ros-noetic-dwa* \
+    ros-noetic-gazebo-ros-pkgs \
+    python3-vcstool \
+    python3-wstool &&\
     sudo rosdep init && \
-    rosdep update --rosdistro ${ROS_DISTRO} && \
+    rosdep update && \
     sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 
 # install xacro
-RUN pip3 install xacro
-
-# set ros2 workspace
-RUN source /opt/ros/${ROS_DISTRO}/setup.bash && mkdir -p ros2_ws/src && cd ~/ros2_ws && colcon build --symlink-install
-
-# check OpenGL
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
-        libglvnd0 \
-        libgl1 \
-        libglx0 \
-        libegl1 \
-        libxext6 \
-        libx11-6 && \
+    ros-noetic-xacro \
+    && \
     sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,graphics
+# set catkin workspace
+RUN source /opt/ros/noetic/setup.bash && mkdir -p catkin_ws/src && cd ~/catkin_ws && catkin build 
+
+# orne-box install
+RUN sudo apt-get update &&\
+    cd ~/catkin_ws/src &&\
+    git clone -b TC_2024_EX https://github.com/masakifujiwara1/orne-box &&\
+    wstool init &&\
+    wstool merge orne-box/orne_box_pkgs.install &&\
+    wstool up &&\
+    rosdep update &&\
+    rosdep install --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y &&\
+    cd ~/catkin_ws &&\
+    catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release &&\
+    source /opt/ros/noetic/setup.bash &&\
+    source ~/catkin_ws/devel/setup.bash &&\
+    sudo apt-get clean && \
+    sudo rm -rf /var/lib/apt/lists/*
 
 # config setting
 COPY config/.bashrc /home/$USER_NAME/.bashrc
