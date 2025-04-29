@@ -1,5 +1,5 @@
 
-FROM nvidia/cudagl:11.3.0-devel-ubuntu20.04
+FROM nvidia/cuda:11.1.1-devel-ubuntu18.04
 
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND noninteractive
@@ -89,7 +89,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # RUN pip3 install xacro
 
 # install pytorch
-RUN pip3 install torch torchvision
+# RUN pip3 install torch torchvision
 
 WORKDIR /home
 ENV HOME /home

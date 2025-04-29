@@ -4,10 +4,11 @@ eval "docker container run \
 --network host \
 --gpus all \
 -it \
---name my-cudagl \
+--name my-cuda11 \
 -e DISPLAY=$DISPLAY \
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 -v $PWD/docker_share:/home/host_files \
+-v ~/.ssh/id_rsa:/root/.ssh/id_rsa \
 --privileged \
 -v /dev:/dev \
 --env="XAUTHORITY=$XAUTH" \
