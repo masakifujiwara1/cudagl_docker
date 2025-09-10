@@ -122,13 +122,12 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
         libx11-6 && \
     sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,graphics
+RUN git clone https://github.com/masakifujiwara1/tmux_config.git && \
+    cp tmux_config/.tmux.conf ~/ && \
+    rm -rf tmux_config
 
-# config setting
-COPY config/.bashrc /home/$USER_NAME/.bashrc
-COPY config/.vimrc /home/$USER_NAME/.vimrc
-COPY config/.tmux.conf /home/$USER_NAME/.tmux.conf
+ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 RUN sudo chown -R $USER_NAME:$PASSWORD .bashrc
 
