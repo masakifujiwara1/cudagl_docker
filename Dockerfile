@@ -1,5 +1,5 @@
 
-FROM nvidia/cudagl:11.3.0-devel-ubuntu20.04
+FROM nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04
 
 SHELL ["/bin/bash", "-c"]
 
