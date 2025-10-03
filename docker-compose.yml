@@ -25,8 +25,8 @@ services:
     tty: true
 
   gpu:
-    container_name: my-cudagl-gpu
-    image: masakifujiwara1/cudagl:my-cudagl
+    container_name: my-nuPlan-gpu
+    image: masakifujiwara1/cudagl:my-nuPlan
     build:
       context: .
       dockerfile: Dockerfile

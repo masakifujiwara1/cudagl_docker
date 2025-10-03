@@ -1,5 +1,5 @@
 
-FROM nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04
+FROM nvidia/cuda:11.1.1-devel-ubuntu20.04
 
 SHELL ["/bin/bash", "-c"]
 
@@ -60,19 +60,49 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gedit \
     gnupg2 \
     build-essential \
-    python3-dev \
-    python3-pip \
+    # python3-dev \
+    # python3-pip \
     xdg-utils \
     nautilus \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libreadline-dev \
+    libncursesw5-dev \
+    libssl-dev \
+    libsqlite3-dev \
+    libgdbm-dev \
+    libbz2-dev \
+    liblzma-dev \
+    zlib1g-dev \
+    uuid-dev \
+    libffi-dev \
+    libdb-dev \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN wget --no-check-certificate https://www.python.org/ftp/python/3.9.5/Python-3.9.5.tgz \
+    && tar -xf Python-3.9.5.tgz \
+    && cd Python-3.9.5 \
+    && ./configure --enable-optimizations\
+    && make \
+    && make install
+
+RUN apt-get autoremove -y
+
 USER $USER_NAME
 WORKDIR /home/$USER_NAME
 
+# install Python packages
+# COPY config/requirements.txt /tmp/requirements.txt
+# RUN pip3 install --upgrade pip && \
+#     pip3 install -r /tmp/requirements.txt
+
 # install pytorch
-RUN pip3 install torch torchvision
+# RUN pip3 install torch torchvision
 
 RUN git clone https://github.com/masakifujiwara1/tmux_config.git && \
     cp tmux_config/.tmux.conf ~/ && \
@@ -80,5 +110,7 @@ RUN git clone https://github.com/masakifujiwara1/tmux_config.git && \
 
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+
+RUN cd && git clone https://github.com/motional/nuplan-devkit.git && cd nuplan-devkit
 
 CMD ["bash"]
