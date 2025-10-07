@@ -25,7 +25,7 @@ services:
     tty: true
 
   gpu:
-    container_name: my-nuPlan-gpu
+    container_name: my-nuPlan-cu117-gpu
     image: masakifujiwara1/cudagl:my-nuPlan-cu117
     build:
       context: .
