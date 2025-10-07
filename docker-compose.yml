@@ -26,7 +26,7 @@ services:
 
   gpu:
     container_name: my-nuPlan-gpu
-    image: masakifujiwara1/cudagl:my-nuPlan
+    image: masakifujiwara1/cudagl:my-nuPlan-cu117
     build:
       context: .
       dockerfile: Dockerfile
