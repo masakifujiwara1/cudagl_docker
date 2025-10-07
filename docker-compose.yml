@@ -21,6 +21,7 @@ services:
       - ${XAUTH:-/tmp/.docker.xauth}:${XAUTH:-/tmp/.docker.xauth}
       - /home/${USER}/.ssh:/home/ubuntu/.ssh
       - /home/${USER}/.gitconfig:/home/ubuntu/.gitconfig
+      - /home/${USER}/nuplan:/home/ubuntu/nuplan
     stdin_open: true
     tty: true
 
